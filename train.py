@@ -123,7 +123,8 @@ class ModelEma:
 
     @torch.no_grad()
     def update(self, model):
-        msd = model.state_dict()
+        source = getattr(model, "_orig_mod", model)
+        msd = source.state_dict()
         for k, v in self.module.state_dict().items():
             if v.dtype.is_floating_point:
                 v.mul_(self.decay).add_(msd[k].detach(), alpha=1.0 - self.decay)
