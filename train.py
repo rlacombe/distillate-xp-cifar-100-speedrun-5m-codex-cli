@@ -230,12 +230,12 @@ def main():
     n_params = sum(p.numel() for p in model.parameters())
     if n_params > 5_000_000:
         raise RuntimeError(f"parameter cap exceeded: {n_params}")
-    ema = ModelEma(model, decay=0.997)
     if device.type == "cuda" and os.environ.get("TORCH_COMPILE", "0") == "1":
         try:
             model = torch.compile(model, mode="reduce-overhead")
         except Exception as exc:
             print(f"compile_skipped={exc}")
+    ema = ModelEma(model, decay=0.997)
     opt = torch.optim.SGD(model.parameters(), lr=0.36, momentum=0.9, weight_decay=4e-4, nesterov=True)
     max_epochs = 220
     sched = torch.optim.lr_scheduler.OneCycleLR(
