@@ -8,6 +8,8 @@ The first usable model was a widened CIFAR ResNet-56 with SGD/Nesterov, OneCycle
 
 Increasing depth from 56 to 68 while lowering `max_lr` from `0.42` to `0.36` improved validation accuracy to 68.04% with 4.20M parameters. It still completed 41 epochs in the same clean training window, so extra depth was effectively free at this scale.
 
+CutMix at 50% per-batch probability did not help. Run `xp-d4e000` completed the same 41 epochs but fell to 67.38% validation accuracy, so the current best remains the pure-mixup ResNet-68 recipe.
+
 Key finding: this short-budget regime is already near the plausible 65-70% ceiling with a plain CNN and careful recipe. The train accuracy proxy is not directly interpretable because batches use mixup, but EMA validation accuracy is strong.
 
-Next hypothesis: keep the depth-68 CNN and tune recipe overhead. Candidate pushes are reducing CPU-heavy RandAugment, trying batch size 768 or 1024, adjusting OneCycle `max_lr`, or replacing mixup-only with CutMix to improve late validation accuracy without slowing the loader.
+Next hypothesis: revert CutMix, keep the depth-68 CNN, and tune recipe overhead. Candidate pushes are reducing CPU-heavy RandAugment, trying batch size 768 or 1024, adjusting OneCycle `max_lr`, or slightly lowering mixup/label smoothing to reduce over-regularization.

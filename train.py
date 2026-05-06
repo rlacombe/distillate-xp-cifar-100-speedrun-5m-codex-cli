@@ -124,6 +124,18 @@ def soft_ce(logits, target):
     return -(target * F.log_softmax(logits, dim=1)).sum(dim=1).mean()
 
 
+def rand_bbox(size, lam):
+    _, _, h, w = size
+    cut = math.sqrt(1.0 - lam)
+    cut_w, cut_h = int(w * cut), int(h * cut)
+    cx, cy = random.randrange(w), random.randrange(h)
+    x1 = max(cx - cut_w // 2, 0)
+    y1 = max(cy - cut_h // 2, 0)
+    x2 = min(cx + cut_w // 2, w)
+    y2 = min(cy + cut_h // 2, h)
+    return x1, y1, x2, y2
+
+
 def load_train_val():
     files = sorted(glob.glob("/data/cifar100/train-*.parquet"))
     files += sorted(glob.glob("/data/cifar100/train/*.parquet"))
@@ -222,7 +234,12 @@ def main():
             y = y.to(device, non_blocking=True)
             idx = torch.randperm(y.size(0), device=device)
             lam = float(torch.distributions.Beta(0.8, 0.8).sample())
-            x = x.mul(lam).add_(x[idx], alpha=1.0 - lam)
+            if random.random() < 0.5:
+                x1, y1, x2, y2 = rand_bbox(x.size(), lam)
+                x[:, :, y1:y2, x1:x2] = x[idx, :, y1:y2, x1:x2]
+                lam = 1.0 - ((x2 - x1) * (y2 - y1) / (x.size(-1) * x.size(-2)))
+            else:
+                x = x.mul(lam).add_(x[idx], alpha=1.0 - lam)
             target = mix_targets(y, N_CLASSES, lam, idx, smoothing=0.08)
             opt.zero_grad(set_to_none=True)
             with torch.autocast(device_type=device.type, dtype=torch.bfloat16, enabled=device.type == "cuda"):
