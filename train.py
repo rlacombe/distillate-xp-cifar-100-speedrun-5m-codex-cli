@@ -195,7 +195,7 @@ def main():
     train_set, val_set = load_train_val()
     workers = int(os.environ.get("NUM_WORKERS", "4"))
     train_loader = DataLoader(
-        train_set, batch_size=512, shuffle=True, num_workers=workers,
+        train_set, batch_size=768, shuffle=True, num_workers=workers,
         pin_memory=True, persistent_workers=workers > 0, prefetch_factor=2 if workers > 0 else None,
         drop_last=True,
     )
@@ -215,10 +215,10 @@ def main():
             model = torch.compile(model, mode="reduce-overhead")
         except Exception as exc:
             print(f"compile_skipped={exc}")
-    opt = torch.optim.SGD(model.parameters(), lr=0.36, momentum=0.9, weight_decay=4e-4, nesterov=True)
+    opt = torch.optim.SGD(model.parameters(), lr=0.44, momentum=0.9, weight_decay=4e-4, nesterov=True)
     max_epochs = 220
     sched = torch.optim.lr_scheduler.OneCycleLR(
-        opt, max_lr=0.36, epochs=max_epochs, steps_per_epoch=len(train_loader),
+        opt, max_lr=0.44, epochs=max_epochs, steps_per_epoch=len(train_loader),
         pct_start=0.12, div_factor=20.0, final_div_factor=200.0,
     )
 
@@ -234,12 +234,7 @@ def main():
             y = y.to(device, non_blocking=True)
             idx = torch.randperm(y.size(0), device=device)
             lam = float(torch.distributions.Beta(0.8, 0.8).sample())
-            if random.random() < 0.5:
-                x1, y1, x2, y2 = rand_bbox(x.size(), lam)
-                x[:, :, y1:y2, x1:x2] = x[idx, :, y1:y2, x1:x2]
-                lam = 1.0 - ((x2 - x1) * (y2 - y1) / (x.size(-1) * x.size(-2)))
-            else:
-                x = x.mul(lam).add_(x[idx], alpha=1.0 - lam)
+            x = x.mul(lam).add_(x[idx], alpha=1.0 - lam)
             target = mix_targets(y, N_CLASSES, lam, idx, smoothing=0.08)
             opt.zero_grad(set_to_none=True)
             with torch.autocast(device_type=device.type, dtype=torch.bfloat16, enabled=device.type == "cuda"):

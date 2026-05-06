@@ -10,6 +10,8 @@ Increasing depth from 56 to 68 while lowering `max_lr` from `0.42` to `0.36` imp
 
 CutMix at 50% per-batch probability did not help. Run `xp-d4e000` completed the same 41 epochs but fell to 67.38% validation accuracy, so the current best remains the pure-mixup ResNet-68 recipe.
 
+Batch size 768 with `max_lr=0.44` was worse. Run `xp-1dd6dc` completed 40 epochs and fell to 64.50%, so the recipe appears to need the batch-512 update count rather than larger batches.
+
 Key finding: this short-budget regime is already near the plausible 65-70% ceiling with a plain CNN and careful recipe. The train accuracy proxy is not directly interpretable because batches use mixup, but EMA validation accuracy is strong.
 
-Next hypothesis: revert CutMix, keep the depth-68 CNN, and tune recipe overhead. Candidate pushes are reducing CPU-heavy RandAugment, trying batch size 768 or 1024, adjusting OneCycle `max_lr`, or slightly lowering mixup/label smoothing to reduce over-regularization.
+Next hypothesis: keep the depth-68 CNN at batch 512 and tune regularization. Candidate pushes are reducing RandAugment magnitude, adjusting OneCycle `max_lr`, or slightly lowering mixup/label smoothing to reduce over-regularization.
