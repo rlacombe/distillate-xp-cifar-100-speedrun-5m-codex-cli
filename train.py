@@ -124,13 +124,18 @@ class ModelEma:
     @torch.no_grad()
     def update(self, model):
         msd = model.state_dict()
-        if any(k.startswith("_orig_mod.") for k in msd):
-            msd = {k.removeprefix("_orig_mod."): v for k, v in msd.items()}
-        for k, v in self.module.state_dict().items():
+        ema_state = self.module.state_dict()
+        for k, v in ema_state.items():
+            raw_k = k.removeprefix("_orig_mod.")
+            src = msd.get(raw_k)
+            if src is None:
+                src = msd.get(f"_orig_mod.{raw_k}")
+            if src is None:
+                raise KeyError(raw_k)
             if v.dtype.is_floating_point:
-                v.mul_(self.decay).add_(msd[k].detach(), alpha=1.0 - self.decay)
+                v.mul_(self.decay).add_(src.detach(), alpha=1.0 - self.decay)
             else:
-                v.copy_(msd[k])
+                v.copy_(src)
 
 
 def mix_targets(y, num_classes, lam, index, smoothing=0.08):
