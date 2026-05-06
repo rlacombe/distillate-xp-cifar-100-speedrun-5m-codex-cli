@@ -1,0 +1,7 @@
+{
+  "harness": "codex",
+  "model": "gpt-5.5-mini",
+  "created_at": "2026-05-06T20:15:46.827804+00:00",
+  "replicate_from": "cifar-100-speedrun-5m",
+  "tmux_session": "xp-cifar-100-speedrun-5m-codex-cli-codex"
+}

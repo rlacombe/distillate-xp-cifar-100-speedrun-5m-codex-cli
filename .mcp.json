@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "distillate": {
+      "command": "/Users/romain/Code/Distillate/distillate-reset/.venv/bin/python3",
+      "args": [
+        "-m",
+        "distillate.mcp_server"
+      ],
+      "env": {}
+    }
+  }
+}
