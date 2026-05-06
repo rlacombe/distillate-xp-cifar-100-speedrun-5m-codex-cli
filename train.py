@@ -225,7 +225,7 @@ def main():
         pin_memory=True, persistent_workers=workers > 0, prefetch_factor=2 if workers > 0 else None,
     )
 
-    model = CifarResNet(depth=68, width=2, drop=0.04).to(device)
+    model = CifarResNet(depth=80, width=2, drop=0.04).to(device)
     model = model.to(memory_format=torch.channels_last)
     n_params = sum(p.numel() for p in model.parameters())
     if n_params > 5_000_000:
