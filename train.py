@@ -1,16 +1,37 @@
-# requirements: torch torchvision datasets pyarrow pillow
 import glob
 import math
 import os
 import random
+import subprocess
+import sys
 import time
 
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from torch.utils.data import DataLoader, Dataset, Subset
+
+
+def ensure_deps():
+    missing = []
+    for mod, pkg in [
+        ("torchvision", "torchvision==0.21.0"),
+        ("datasets", "datasets"),
+        ("pyarrow", "pyarrow"),
+        ("PIL", "pillow"),
+    ]:
+        try:
+            __import__(mod)
+        except ImportError:
+            missing.append(pkg)
+    if missing:
+        subprocess.check_call([sys.executable, "-m", "pip", "install", "-q", *missing])
+
+
+ensure_deps()
+
 from datasets import load_dataset
 from PIL import Image
-from torch.utils.data import DataLoader, Dataset, Subset
 from torchvision import transforms
 
 try:
