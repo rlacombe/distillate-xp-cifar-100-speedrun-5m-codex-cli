@@ -16,5 +16,11 @@
     "script": "train.py",
     "flavor": "h200",
     "submitted_at": "2026-05-06T21:57:10.781272+00:00"
+  },
+  "69fbbc96317220dbbd1a5605": {
+    "project_path": "/Users/romain/Code/Research/distillate-xps/cifar-100-speedrun-5m-codex-cli",
+    "script": "train.py",
+    "flavor": "h200",
+    "submitted_at": "2026-05-06T22:11:34.819165+00:00"
   }
 }

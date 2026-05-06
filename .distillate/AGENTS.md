@@ -49,8 +49,15 @@ recent runs + your current calibration. Read
 `.distillate/calibration_meter.md` and `.distillate/alerts.md` for
 quantitative feedback on your forecasting.
 
-Read `.distillate/steering.md` for the researcher's intent. Treat
-it as authoritative — anything in steering overrides your own plan.
+**Re-read `.distillate/steering.md` BEFORE EVERY PREREG**, not just at
+session start. The researcher (or Nicolas on their behalf) writes new
+steering directives into this file mid-experiment; your protocol
+**must** check for a fresh version on each loop iteration or the
+directive never lands. Treat steering as authoritative — anything in
+it overrides your own plan. If you also receive a `[Steering from
+Nicolas — apply to your next prereg] …` line as user input, that's
+the live-injection version of the same directive — apply it the same
+way.
 
 Check for a pause flag: if `.distillate/pause_requested` exists,
 exit cleanly. Do not start a new run.
@@ -90,6 +97,29 @@ The **prediction** must be concrete and falsifiable — a specific
 metric expectation, not a vague hope. **`confidence`** (0–100)
 measures whether your 70%-confident predictions actually come true
 ~70% of the time. The system tracks your calibration across runs.
+
+**`predicted_metric` MUST be the brief's primary metric** — the one
+declared under `**Optimize:**` in PROMPT.md (also surfaced as
+`metric_name` in `.distillate/experiment.json`). This is the metric
+the leaderboard ranks on, the chart plots, and the calibration view
+aggregates. **Do NOT predict a gate / constraint metric** (e.g. an
+accuracy threshold that gates whether a run "counts") — those live
+in `**Subject to (gates):**`, not in your prereg. If you're
+hypothesising "this run will hit `n_params=4096` and clear the
+`val_accuracy ≥ 0.99` gate," the prereg goes:
+
+```
+"predicted_metric": "n_params",
+"predicted_value": 4096,
+"rationale": "expecting val_acc gate to clear at this size …"
+```
+
+Predicting on the gate metric (e.g. `predicted_metric: "val_accuracy",
+predicted_value: 0.99`) defeats both the leaderboard ranking and the
+calibration tracker — it anchors every run on the threshold and
+produces no usable signal about whether you're improving on the
+actual objective. **The brief's metric is the one and only
+`predicted_metric` — every prereg, every run.**
 
 After appending the row, **WAIT for the watcher to commit and push
 the prereg**. The watcher polls `runs.jsonl` and commits each new

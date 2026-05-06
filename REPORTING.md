@@ -106,7 +106,7 @@ For clean epoch-boundary stops (so the wrapper's SIGTERM doesn't chop mid-step),
 ```python
 from distillate.budget import read_train_budget
 
-MAX_SECONDS = read_train_budget()  # train_budget_seconds - 300s reserve
+MAX_SECONDS = read_train_budget()  # train_budget_seconds minus an adaptive reserve (10% of budget, clamped 30s-300s)
 
 _start = time.time()
 for epoch in range(max_epochs):
@@ -129,6 +129,10 @@ Call `conclude_run` with your results — it auto-detects whether the run is `be
 - For all other runs, omit `status`. The tool compares against the key metric frontier and returns `is_best: true/false`.
 
 Create the `.distillate/` directory if it doesn't exist. This enables live experiment tracking and cross-session awareness.
+
+### HF Jobs auth — already wired
+
+The MCP HF Jobs tools (`submit_hf_job`, `check_hf_job`, `tail_hf_job_logs`, `cancel_hf_job`, `list_hf_jobs`) authenticate via the `hf` CLI's cached token at `~/.cache/huggingface/token` automatically — **no `HF_TOKEN` environment variable required**. If you've run `hf auth login` (or `huggingface-cli login`) at any point, the MCP tools see your credentials and just work. Don't `printenv HF_TOKEN`, don't paste a token anywhere — call `submit_hf_job` directly.
 
 ### Updating RESULTS.md
 
