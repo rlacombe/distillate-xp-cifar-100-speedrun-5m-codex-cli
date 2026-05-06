@@ -1,0 +1,8 @@
+{
+  "69fbafa5aff1cd33e8f2e9ed": {
+    "project_path": "/Users/romain/Code/Research/distillate-xps/cifar-100-speedrun-5m-codex-cli",
+    "script": "train.py",
+    "flavor": "h200",
+    "submitted_at": "2026-05-06T21:16:21.974180+00:00"
+  }
+}
