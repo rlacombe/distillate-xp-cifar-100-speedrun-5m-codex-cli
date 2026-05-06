@@ -123,8 +123,9 @@ class ModelEma:
 
     @torch.no_grad()
     def update(self, model):
-        source = getattr(model, "_orig_mod", model)
-        msd = source.state_dict()
+        msd = model.state_dict()
+        if any(k.startswith("_orig_mod.") for k in msd):
+            msd = {k.removeprefix("_orig_mod."): v for k, v in msd.items()}
         for k, v in self.module.state_dict().items():
             if v.dtype.is_floating_point:
                 v.mul_(self.decay).add_(msd[k].detach(), alpha=1.0 - self.decay)
