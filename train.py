@@ -192,7 +192,7 @@ def main():
         pin_memory=True, persistent_workers=workers > 0, prefetch_factor=2 if workers > 0 else None,
     )
 
-    model = CifarResNet(depth=56, width=2, drop=0.04).to(device)
+    model = CifarResNet(depth=68, width=2, drop=0.04).to(device)
     model = model.to(memory_format=torch.channels_last)
     n_params = sum(p.numel() for p in model.parameters())
     if n_params > 5_000_000:
@@ -203,10 +203,10 @@ def main():
             model = torch.compile(model, mode="reduce-overhead")
         except Exception as exc:
             print(f"compile_skipped={exc}")
-    opt = torch.optim.SGD(model.parameters(), lr=0.42, momentum=0.9, weight_decay=4e-4, nesterov=True)
+    opt = torch.optim.SGD(model.parameters(), lr=0.36, momentum=0.9, weight_decay=4e-4, nesterov=True)
     max_epochs = 220
     sched = torch.optim.lr_scheduler.OneCycleLR(
-        opt, max_lr=0.42, epochs=max_epochs, steps_per_epoch=len(train_loader),
+        opt, max_lr=0.36, epochs=max_epochs, steps_per_epoch=len(train_loader),
         pct_start=0.12, div_factor=20.0, final_div_factor=200.0,
     )
 
