@@ -200,7 +200,7 @@ def load_train_val():
         transforms.RandAugment(num_ops=2, magnitude=9),
         transforms.ToTensor(),
         transforms.Normalize(MEAN, STD),
-            transforms.RandomErasing(p=0.08, scale=(0.02, 0.18), ratio=(0.3, 3.3), value=0),
+            transforms.RandomErasing(p=0.1, scale=(0.02, 0.18), ratio=(0.3, 3.3), value=0),
     ])
     val_tf = transforms.Compose([transforms.ToTensor(), transforms.Normalize(MEAN, STD)])
     return CifarParquet(ds, train_idx, train_tf), CifarParquet(ds, val_idx, val_tf)
@@ -276,7 +276,7 @@ def main():
             idx = torch.randperm(y.size(0), device=device)
             lam = float(torch.distributions.Beta(0.8, 0.8).sample())
             x = x.mul(lam).add_(x[idx], alpha=1.0 - lam)
-            target = mix_targets(y, N_CLASSES, lam, idx, smoothing=0.03)
+            target = mix_targets(y, N_CLASSES, lam, idx, smoothing=0.05)
             opt.zero_grad(set_to_none=True)
             with torch.autocast(device_type=device.type, dtype=torch.bfloat16, enabled=device.type == "cuda"):
                 logits = model(x)
