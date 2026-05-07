@@ -6,15 +6,10 @@ import subprocess
 import sys
 import time
 
-import torch
-import torch.nn as nn
-import torch.nn.functional as F
-from torch.utils.data import DataLoader, Dataset, Subset
-
-
 def ensure_deps():
     missing = []
     for mod, pkg in [
+        ("torch", "torch"),
         ("torchvision", "torchvision==0.21.0"),
         ("datasets", "datasets"),
         ("pyarrow", "pyarrow"),
@@ -25,10 +20,27 @@ def ensure_deps():
         except ImportError:
             missing.append(pkg)
     if missing:
-        subprocess.check_call([sys.executable, "-m", "pip", "install", "-q", *missing])
+        cmd = [
+            sys.executable,
+            "-m",
+            "pip",
+            "install",
+            "-q",
+            "--index-url",
+            "https://download.pytorch.org/whl/cu124",
+            "--extra-index-url",
+            "https://pypi.org/simple",
+            *missing,
+        ]
+        subprocess.check_call(cmd)
 
 
 ensure_deps()
+
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+from torch.utils.data import DataLoader, Dataset, Subset
 
 from datasets import load_dataset
 from PIL import Image
@@ -243,7 +255,7 @@ def main():
         except Exception as exc:
             print(f"compile_skipped={exc}")
     ema_source = getattr(model, "_orig_mod", model)
-    ema = ModelEma(ema_source, decay=0.998)
+    ema = ModelEma(ema_source, decay=0.997)
     opt = torch.optim.SGD(model.parameters(), lr=0.36, momentum=0.9, weight_decay=1e-4, nesterov=True)
     max_epochs = 220
     sched = torch.optim.lr_scheduler.OneCycleLR(
