@@ -255,11 +255,11 @@ def main():
         except Exception as exc:
             print(f"compile_skipped={exc}")
     ema_source = getattr(model, "_orig_mod", model)
-    ema = ModelEma(ema_source, decay=0.993)
-    opt = torch.optim.SGD(model.parameters(), lr=0.36, momentum=0.9, weight_decay=1e-4, nesterov=True)
+    ema = ModelEma(ema_source, decay=0.994)
+    opt = torch.optim.SGD(model.parameters(), lr=0.38, momentum=0.9, weight_decay=1e-4, nesterov=True)
     max_epochs = 220
     sched = torch.optim.lr_scheduler.OneCycleLR(
-        opt, max_lr=0.36, epochs=max_epochs, steps_per_epoch=len(train_loader),
+        opt, max_lr=0.38, epochs=max_epochs, steps_per_epoch=len(train_loader),
         pct_start=0.12, div_factor=20.0, final_div_factor=200.0,
     )
 
