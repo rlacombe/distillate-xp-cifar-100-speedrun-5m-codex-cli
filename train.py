@@ -256,7 +256,7 @@ def main():
             print(f"compile_skipped={exc}")
     ema_source = getattr(model, "_orig_mod", model)
     ema = ModelEma(ema_source, decay=0.997)
-    opt = torch.optim.SGD(model.parameters(), lr=0.36, momentum=0.9, weight_decay=1e-4, nesterov=True)
+    opt = torch.optim.SGD(model.parameters(), lr=0.36, momentum=0.9, weight_decay=8e-5, nesterov=True)
     max_epochs = 220
     sched = torch.optim.lr_scheduler.OneCycleLR(
         opt, max_lr=0.36, epochs=max_epochs, steps_per_epoch=len(train_loader),
@@ -276,7 +276,7 @@ def main():
             idx = torch.randperm(y.size(0), device=device)
             lam = float(torch.distributions.Beta(0.8, 0.8).sample())
             x = x.mul(lam).add_(x[idx], alpha=1.0 - lam)
-            target = mix_targets(y, N_CLASSES, lam, idx, smoothing=0.05)
+            target = mix_targets(y, N_CLASSES, lam, idx, smoothing=0.03)
             opt.zero_grad(set_to_none=True)
             with torch.autocast(device_type=device.type, dtype=torch.bfloat16, enabled=device.type == "cuda"):
                 logits = model(x)
