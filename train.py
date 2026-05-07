@@ -255,7 +255,7 @@ def main():
         except Exception as exc:
             print(f"compile_skipped={exc}")
     ema_source = getattr(model, "_orig_mod", model)
-    ema = ModelEma(ema_source, decay=0.995)
+    ema = ModelEma(ema_source, decay=0.994)
     opt = torch.optim.SGD(model.parameters(), lr=0.36, momentum=0.9, weight_decay=1e-4, nesterov=True)
     max_epochs = 220
     sched = torch.optim.lr_scheduler.OneCycleLR(
