@@ -200,7 +200,7 @@ def load_train_val():
         transforms.RandAugment(num_ops=2, magnitude=9),
         transforms.ToTensor(),
         transforms.Normalize(MEAN, STD),
-            transforms.RandomErasing(p=0.0, scale=(0.02, 0.18), ratio=(0.3, 3.3), value=0),
+            transforms.RandomErasing(p=0.1, scale=(0.02, 0.18), ratio=(0.3, 3.3), value=0),
     ])
     val_tf = transforms.Compose([transforms.ToTensor(), transforms.Normalize(MEAN, STD)])
     return CifarParquet(ds, train_idx, train_tf), CifarParquet(ds, val_idx, val_tf)
